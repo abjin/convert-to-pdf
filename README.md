@@ -1,8 +1,12 @@
 # Convert PPT to PDF
 
-Batch convert PowerPoint files to PDF using Automator on macOS
+Batch convert PowerPoint and Word files to PDF using Automator on macOS
 
 ## News
+- **Current Date**: Script Update
+  - Added support for converting Microsoft Word documents (.doc and .docx) to PDF.
+  - The same Quick Action now handles both PowerPoint and Word files.
+
 - **August 30, 2024**: Pull Request Merged
 	- A [PR#6](https://github.com/jeongwhanchoi/convert-ppt-to-pdf/pull/6) updating the convert-ppt-to-pdf.applescript has been merged. This update includes:
 		- Improved compatibility with the new Mac OS.
@@ -83,13 +87,40 @@ on run {input, parameters}
     tell application "Microsoft PowerPoint" -- work on version 15.15 or newer
         quit
     end tell
+    
+    tell application "Microsoft Word" -- work on version 15.15 or newer
+        launch
+        repeat with i in input
+            set t to i as string
+            -- do shell script "echo 'Processing: " & t & "' >> " & logFile -- for logging
+            if t ends with ".doc" or t ends with ".docx" then
+                set pdfPath to my makeNewPath(i)
+                -- do shell script "echo 'Saving to: " & pdfPath & "' >> " & logFile -- for logging
+                try
+                    open i
+                    set activeDoc to active document
+                    -- Export the active document to PDF
+                    save activeDoc in (POSIX file pdfPath) as save as PDF
+                    close active document saving no
+                    set end of theOutput to pdfPath
+                    -- Log the path to the console
+                    -- do shell script "echo 'Saved PDF to: " & pdfPath & "' >> " & logFile -- for logging
+                on error errMsg
+                    -- do shell script "echo 'Error: " & errMsg & "' >> " & logFile -- for logging
+                end try
+            end if
+        end repeat
+    end tell
+    tell application "Microsoft Word" -- work on version 15.15 or newer
+        quit
+    end tell
     -- do shell script "echo 'Conversion completed.' >> " & logFile -- for logging
     return theOutput
 end run
 
 on makeNewPath(f)
     set t to f as string
-    if t ends with ".pptx" then
+    if t ends with ".pptx" or t ends with ".docx" then
         return (POSIX path of (text 1 thru -6 of t)) & ".pdf"
     else
         return (POSIX path of (text 1 thru -5 of t)) & ".pdf"
@@ -100,12 +131,12 @@ end makeNewPath
 ---
 
 ### 6. Save the Quick Action
-Give your workflow a name (e.g., "Convert PPT to PDF") and save it.
+Give your workflow a name (e.g., "Convert to PDF") and save it.
 
 ## How to Use
-1. In Finder, select the PowerPoint files you want to convert.
+1. In Finder, select the PowerPoint or Word files you want to convert.
 2. Right-click to open the context menu.
-3. Navigate to Quick Actions > "Convert PPT to PDF".
+3. Navigate to Quick Actions > "Convert to PDF".
 4. Wait for the conversion process to complete.
 
 <img src="img/img-05.png" width="300">
