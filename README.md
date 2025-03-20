@@ -3,7 +3,7 @@
 Batch convert PowerPoint and Word files to PDF using Automator on macOS
 
 ## News
-- **Current Date**: Script Update
+- **March 20, 2025**: Script Update
   - Added support for converting Microsoft Word documents (.doc and .docx) to PDF.
   - The same Quick Action now handles both PowerPoint and Word files.
 
